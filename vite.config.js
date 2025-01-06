@@ -2,14 +2,18 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
 
+// Helper to create correct paths
+const extensionPath = (path) => resolve(__dirname, 'extension', path);
+
 export default defineConfig({
   plugins: [react()],
+  root: resolve(__dirname, 'extension'),
   build: {
     rollupOptions: {
       input: {
-        popup: resolve(__dirname, 'extension/popup.html'),
-        background: resolve(__dirname, 'extension/background.js'),
-        content: resolve(__dirname, 'extension/content.js'),
+        popup: extensionPath('popup.html'),
+        background: extensionPath('background.js'),
+        content: extensionPath('content.js'),
       },
       output: {
         entryFileNames: '[name].js',
@@ -18,7 +22,7 @@ export default defineConfig({
         dir: 'dist/extension',
       },
     },
-    outDir: 'dist/extension',
+    outDir: '../dist/extension',
     emptyOutDir: true,
   },
   optimizeDeps: {
