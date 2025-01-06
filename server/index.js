@@ -1,7 +1,7 @@
 import express, { urlencoded } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import path from 'path'
+import path from 'path';
 import { fileURLToPath } from 'url';
 
 // Config path for usability in ES Module
@@ -15,8 +15,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
 	cors({
-		origin: ['http://localhost:5173'],
-		methods: ['GET', 'POST', 'PUT', 'DELETE'],
+		origin: ['http://localhost:5173'], // Front-end PORT
+		methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allowed Methods
 	})
 );
 
@@ -24,51 +24,56 @@ app.use(express.static(path.resolve(__dirname, './')));
 app.use(express.static(path.resolve(__dirname, '../src')));
 app.use(express.static(path.resolve(__dirname, '../index.html')));
 
+// Server runs on PORT 3000
 const PORT = 3000;
 const server = app.listen(PORT, () => {
-  console.log(`😘 Server is running on PORT ${PORT}`);
-  console.log(`🌴 Current environment: ${process.env.NODE_ENV}`);
+	console.log(`😘 Server is running on PORT ${PORT}`);
+	console.log(`🌴 Current environment: ${process.env.NODE_ENV}`);
 });
 
 // Catch-all Route
 app.use('*', (req, res) => {
-  res.status(404).json('Page Not Found');
+	res.status(404).json('Page Not Found');
 });
 
 // Global Error Handler
 app.use((err, req, res, next) => {
-  const defaultError = {
-    log: `😱 Unknown middleware error: ${err}`,
-    status: 500,
-    message: { err: 'An error occurred' },
-  };
+	const defaultError = {
+		log: `😱 Unknown middleware error: ${err}`,
+		status: 500,
+		message: { err: 'An error occurred' },
+	};
 
-  const customError = Object.assign({}, defaultError, err);
-  console.log(customError.log);
-  return res.status(customError.status).json(customError.message);
+	const customError = Object.assign({}, defaultError, err);
+	console.log(customError.log);
+	return res.status(customError.status).json(customError.message);
 });
 
 // Graceful Shutdown Function
 let isShuttingDown = false;
 
 const gracefulShutdown = async () => {
-  if (isShuttingDown) return;
-  isShuttingDown = true;
-  console.log('👂 Received Shut Down Signal. Gracefully Shutting Down...');
+	if (isShuttingDown) return;
+	isShuttingDown = true;
+	console.log('👂 Received Shut Down Signal. Gracefully Shutting Down...');
 
-  try {
-    await new Promise((resolve, reject) => {
-      server.close((err) => {
-        if (err) reject(err);
-        resolve();
-      });
-    });
-  } catch (error) {
-    console.error(`😭 Unable to gracefully shut down the server. Force exiting... - ${error}`);
-    process.exitCode = 1;
-  }
+	try {
+		await server.close((err) => {
+			if (err) {
+				console.error(`🥲 Unable to shutdown the server: ${err}`);
+			}
+		});
+
+		console.log(`💃🏻 Server has been shutted down gracefuly`);
+		process.exitCode = 0;
+	} catch (error) {
+		console.error(
+			`😭 Unable to gracefully shut down the server. Force exiting... - ${error}`
+		);
+		process.exitCode = 1;
+	}
 };
 
 // Shutdown Signals
-process.on("SIGINT", gracefulShutdown);
-process.on("SIGTERM", gracefulShutdown);
+process.on('SIGINT', gracefulShutdown);
+process.on('SIGTERM', gracefulShutdown);
