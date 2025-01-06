@@ -1,8 +1,9 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
+import tailwindcss from 'tailwindcss';
+import autoprefixer from 'autoprefixer';
 
-// Helper to create correct paths
 const extensionPath = (path) => resolve(__dirname, 'extension', path);
 
 export default defineConfig({
@@ -27,5 +28,10 @@ export default defineConfig({
   },
   optimizeDeps: {
     exclude: ['lucide-react'],
+  },
+  css: {
+    postcss: {
+      plugins: [tailwindcss, autoprefixer],
+    },
   },
 });

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom/client';
+import './styles.css';
 
 function Popup() {
   const [clipboardHistory, setClipboardHistory] = useState([]);
@@ -43,7 +44,6 @@ function Popup() {
               onClick={() => copyToClipboard(item)}
             >
               <p className='truncate'>{item}</p>
-              <p className='text-xs text-gray-500'>Click to copy</p>
             </div>
           ))
         )}
