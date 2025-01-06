@@ -5,6 +5,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 import connectDB from './db/mongo';
+import hotbarRoutes from './routes/hotbarRoutes.js';
 
 // Config path for usability in ES Module
 const __filename = fileURLToPath(import.meta.url);
@@ -28,6 +29,9 @@ app.use(express.static(path.resolve(__dirname, '../index.html')));
 
 // Connect to DB
 connectDB();
+
+// API Routes
+app.use('/api/hotbar', hotbarRoutes);
 
 // Server runs on PORT 3000
 const PORT = 3000;
