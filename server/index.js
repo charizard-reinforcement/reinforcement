@@ -3,6 +3,8 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
+
+import connectDB from './db/mongo';
 import hotbarRoutes from './routes/hotbarRoutes.js';
 
 // Config path for usability in ES Module
@@ -25,6 +27,9 @@ app.use(express.static(path.resolve(__dirname, './')));
 app.use(express.static(path.resolve(__dirname, '../src')));
 app.use(express.static(path.resolve(__dirname, '../index.html')));
 
+// Connect to DB
+connectDB();
+
 // API Routes
 app.use('/api/hotbar', hotbarRoutes);
 
@@ -36,12 +41,12 @@ const server = app.listen(PORT, () => {
 });
 
 // Catch-all Route
-app.use('*', (req, res) => {
+app.use('*', (_req, res) => {
 	res.status(404).json('Page Not Found');
 });
 
 // Global Error Handler
-app.use((err, req, res, next) => {
+app.use((err, _req, res, _next) => {
 	const defaultError = {
 		log: `😱 Unknown middleware error: ${err}`,
 		status: 500,
