@@ -16,3 +16,6 @@ router.get('/' async (req, res, next) => {
 });
 
 // Update an existing hotbar slot
+
+
+export default router;
