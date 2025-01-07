@@ -1,78 +1,78 @@
 import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom/client';
+import './styles.css';
 
 function LoginPage() {
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
-    const [isLoggedIn, setisLoggedIn] = useState(false);
-    const [errorMsg, seterrorMsg] = useState('');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [isLoggedIn, setisLoggedIn] = useState(false);
+  const [errorMsg, seterrorMsg] = useState('');
 
-  
-    const handleLogin = async() => {
-      // setisLoggedIn(true);
-      try {
-        const response = await fetch('/api/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username, password }),
-        });
-  
-        if (response.ok) {
-          const data = await response.json();
-          console.log('Login Success:', data);
-          setIsLoggedIn(true);
-          seterrorMsg(''); 
-        } else {
-          seterrorMsg('Invalid credentials');
-        }
-      } catch (err) {
-        seterrorMsg('An error occurred. Please try again.');
+  const handleLogin = async () => {
+    // setisLoggedIn(true);
+    try {
+      const response = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Login Success:', data);
+        setIsLoggedIn(true);
+        seterrorMsg('');
+      } else {
+        seterrorMsg('Invalid credentials');
       }
-    };
+    } catch (err) {
+      seterrorMsg('An error occurred. Please try again.');
+    }
+  };
 
-    const handleLogout = () => {
-      setIsLoggedIn(false);
-    };
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+  };
 
-    return (
-      <div>
-        {isLoggedIn ? (
+  return (
+    <div>
+      {isLoggedIn ? (
+        <div>
+          <h2>Welcome, {username}!</h2>
+          <button onClick={handleLogout}>Logout</button>
+          <Popup />
+        </div>
+      ) : (
+        <div>
+          <h2>Login Page</h2>
           <div>
-            <h2>Welcome, {username}!</h2>
-            <button onClick={handleLogout}>Logout</button>
-            <Popup />
+            <label>
+              Username:
+              <input
+                type='text'
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+              />
+            </label>
           </div>
-        ) : (
           <div>
-            <h2>Login Page</h2>
-              <div>
-                <label>
-                  Username:
-                  <input
-                    type="text"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                  />
-                </label>
-              </div>
-              <div>
-                <label>
-                  Password:
-                  <input
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
-                </label>
-              </div>
-            <button onClick={handleLogin}>Login</button>
+            <label>
+              Password:
+              <input
+                type='password'
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </label>
           </div>
-        )}
-      </div>
-    );
-  }
-  
-  // export default LoginPage;
+          <button onClick={handleLogin}>Login</button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// export default LoginPage;
 
 // function Popup() {
 //   return (
@@ -124,7 +124,6 @@ function Popup() {
               onClick={() => copyToClipboard(item)}
             >
               <p className='truncate'>{item}</p>
-              <p className='text-xs text-gray-500'>Click to copy</p>
             </div>
           ))
         )}
@@ -133,9 +132,9 @@ function Popup() {
   );
 }
 
-
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <LoginPage />
+    <Popup />
   </React.StrictMode>
 );
