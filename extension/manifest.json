@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "Clipboard History",
+  "version": "1.0",
+  "description": "Store and manage your last 10 copied items.",
+  "permissions": ["storage", "clipboardRead", "clipboardWrite"],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"]
+    }
+  ]
+}
