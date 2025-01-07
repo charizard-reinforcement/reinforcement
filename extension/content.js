@@ -179,9 +179,29 @@ function render() {
         use(i);
       };
       innerNode.style.overflow = 'hidden';
+      innerNode.style.color = 'black';
+      if (response.clipboardHistory[i]) {
+        let fontZise; // should be avaliable space / number of letters around to equals the size of each
+        if (response.clipboardHistory[i].data.length < 10) {
+          fontZise = 22;
+        } else if (response.clipboardHistory[i].data.length < 20) {
+          fontZise = 14;
+        } else if (response.clipboardHistory[i].data.length < 35) {
+          fontZise = 10;
+        } else if (response.clipboardHistory[i].data.length < 50) {
+          fontZise = 8;
+        } else {
+          fontZise = 25 / (response.clipboardHistory[i].data.length / 25);
+        }
+
+        if (fontZise < 1) fontZise = 1;
+        innerNode.style.fontSize = `${fontZise}px`;
+      }
+
       innerNode.style.margin = '0px';
       innerNode.style.width = '80px';
       innerNode.style.height = '80px';
+      innerNode.style.overflowWrap = 'break-word';
       outerNode.appendChild(innerNode);
     }
 
