@@ -48,21 +48,13 @@ function LoginPage() {
           <div>
             <label>
               Username:
-              <input
-                type='text'
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-              />
+              <input type='text' value={username} onChange={(e) => setUsername(e.target.value)} />
             </label>
           </div>
           <div>
             <label>
               Password:
-              <input
-                type='password'
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
+              <input type='password' value={password} onChange={(e) => setPassword(e.target.value)} />
             </label>
           </div>
           <button onClick={handleLogin}>Login</button>
@@ -118,11 +110,7 @@ function Popup() {
           <p className='text-gray-500'>No items in clipboard history</p>
         ) : (
           clipboardHistory.map((item, index) => (
-            <div
-              key={index}
-              className='p-2 border rounded hover:bg-gray-100 cursor-pointer group'
-              onClick={() => copyToClipboard(item)}
-            >
+            <div key={index} className='p-2 border rounded hover:bg-gray-100 cursor-pointer group' onClick={() => copyToClipboard(item)}>
               <p className='truncate'>{item}</p>
             </div>
           ))
@@ -136,5 +124,5 @@ ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <LoginPage />
     <Popup />
-  </React.StrictMode>
+  </React.StrictMode>,
 );
