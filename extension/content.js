@@ -185,13 +185,15 @@ function render() {
         if (response.clipboardHistory[i].data.length < 10) {
           fontZise = 22;
         } else if (response.clipboardHistory[i].data.length < 20) {
+          // the math dosent math very well uwith thhis small of numbers
           fontZise = 14;
-        } else if (response.clipboardHistory[i].data.length < 35) {
-          fontZise = 10;
-        } else if (response.clipboardHistory[i].data.length < 50) {
-          fontZise = 8;
         } else {
-          fontZise = 25 / (response.clipboardHistory[i].data.length / 25);
+          // mathematically
+          // we have a certan area for the box in square px then we have each char taking up its height in px * its height in px square px (aruend), so the square of the nessesary height of each char is equal to the space allowed / the number of chars needed
+          // ie eachheight squared = allocated size / number of items
+          let constantAreaForBox = 6000;
+          let squaredOfZise = constantAreaForBox / response.clipboardHistory[i].data.length;
+          fontZise = Math.sqrt(squaredOfZise);
         }
 
         if (fontZise < 1) fontZise = 1;
@@ -201,7 +203,7 @@ function render() {
       innerNode.style.margin = '0px';
       innerNode.style.width = '80px';
       innerNode.style.height = '80px';
-      innerNode.style.overflowWrap = 'break-word';
+      innerNode.style.overflowWrap = 'normal'; // lol, i think this is actually best
       outerNode.appendChild(innerNode);
     }
 
