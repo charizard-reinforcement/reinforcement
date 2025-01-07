@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom/client';
+import './styles.css';
 
 function LoginPage() {
   const [username, setUsername] = useState('');
@@ -111,7 +112,6 @@ function Popup() {
           clipboardHistory.map((item, index) => (
             <div key={index} className='p-2 border rounded hover:bg-gray-100 cursor-pointer group' onClick={() => copyToClipboard(item)}>
               <p className='truncate'>{item}</p>
-              <p className='text-xs text-gray-500'>Click to copy</p>
             </div>
           ))
         )}
