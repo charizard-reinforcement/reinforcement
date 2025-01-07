@@ -1,6 +1,10 @@
 console.log('Content script loaded');
 const INVENTORY_SIZE = 10;
 
+addEventListener('focus', (event) => {
+  render();
+});
+
 document.addEventListener('copy', () => {
   console.log('Copy event detected');
 
@@ -131,7 +135,7 @@ const keyDownFunction = (event) => {
       if (adjusted < 0) {
         adjusted = 9;
       }
-      if (response.clipboardHistory[adjusted] !== null) {
+      if (response.clipboardHistory[adjusted] && response.clipboardHistory[adjusted] !== null) {
         setHighlighted(adjusted);
         copyToClipboard(response.clipboardHistory[adjusted].data);
       }
