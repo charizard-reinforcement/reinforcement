@@ -40,7 +40,7 @@ function cutCopyEvent(event) {
       },
       (response) => {
         console.log('Background script response:', response);
-      },
+      }
     );
   } else {
     console.log('No text selected during copy event');
@@ -130,7 +130,10 @@ const keyDownFunction = (event) => {
       if (adjusted < 0) {
         adjusted = 9;
       }
-      if (response.clipboardHistory[adjusted] && response.clipboardHistory[adjusted] !== null) {
+      if (
+        response.clipboardHistory[adjusted] &&
+        response.clipboardHistory[adjusted] !== null
+      ) {
         setHighlighted(adjusted);
         copyToClipboard(response.clipboardHistory[adjusted].data);
       }
@@ -143,69 +146,127 @@ function render() {
   chrome.storage.local.get(['clipboardHistory'], (response) => {
     console.log(response);
     const DOMBODY = window.document.querySelector('body');
+
+    // Remove existing hotbar if present
+    const existingHotbar = DOMBODY.querySelector('#minecraft-hotbar');
+    if (existingHotbar) {
+      existingHotbar.remove();
+    }
+
     const outerNode = document.createElement('div');
+    outerNode.id = 'minecraft-hotbar';
 
+    // Minecraft hotbar styling
     outerNode.style.zIndex = 999999999;
-    outerNode.style.margin = '0px';
     outerNode.style.position = 'fixed';
-    //outerNode.style.backgroundColor = 'orange';
-
-    outerNode.style.left = '0px';
-    outerNode.style.top = 'calc(100vh - 120px)';
-    outerNode.style.width = '100vw';
-    outerNode.style.padding = 'auto';
+    outerNode.style.left = '50%';
+    outerNode.style.transform = 'translateX(-50%)';
+    outerNode.style.bottom = '20px';
     outerNode.style.display = 'flex';
-    outerNode.style.justifyContent = 'center';
+    outerNode.style.gap = '4px';
+    outerNode.style.padding = '8px';
+    outerNode.style.background = 'rgba(0, 0, 0, 0.75)';
+    outerNode.style.borderRadius = '8px';
+    outerNode.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.3)';
 
     for (let i = 0; i < 10; i++) {
+      const slotContainer = document.createElement('div');
       const innerNode = document.createElement('button');
 
-      //innerNode.style.backgroundColor = 'lightGray';
+      // Slot number styling (Minecraft-style)
+      const slotNumber = document.createElement('div');
+      slotNumber.innerText = i === 9 ? '0' : (i + 1).toString();
+      slotNumber.style.position = 'absolute';
+      slotNumber.style.bottom = '2px';
+      slotNumber.style.right = '4px';
+      slotNumber.style.color = 'white';
+      slotNumber.style.fontSize = '12px';
+      slotNumber.style.textShadow = '1px 1px 1px rgba(0, 0, 0, 0.8)';
+
+      // Container styling
+      slotContainer.style.position = 'relative';
+      slotContainer.style.width = '64px';
+      slotContainer.style.height = '64px';
+
+      // Minecraft slot styling
+      innerNode.style.width = '100%';
+      innerNode.style.height = '100%';
+      innerNode.style.backgroundColor = '#8B8B8B';
+      innerNode.style.border = '2px solid #373737';
+      innerNode.style.boxSizing = 'border-box';
+      innerNode.style.display = 'flex';
+      innerNode.style.alignItems = 'center';
+      innerNode.style.justifyContent = 'center';
+      innerNode.style.padding = '4px';
+      innerNode.style.cursor = 'pointer';
+      innerNode.style.position = 'relative';
+      innerNode.style.fontFamily = 'Arial, sans-serif';
+      innerNode.style.overflow = 'hidden';
+
+      // Selected slot styling (highlighted)
       if (i === highlighted) {
-        innerNode.style.border = '5px solid black';
-      } else {
-        innerNode.style.border = '5px solid gray';
+        innerNode.style.border = '2px solid #ffffff';
+        innerNode.style.backgroundColor = '#6B6B6B';
       }
-      if (response.clipboardHistory[i] && response.clipboardHistory[i] !== null) {
+
+      // Content styling
+      if (
+        response.clipboardHistory[i] &&
+        response.clipboardHistory[i] !== null
+      ) {
         innerNode.innerText = response.clipboardHistory[i].data;
-        innerNode.style.backgroundImage = 'linear-gradient(to top right, lightgrey, white)';
+        innerNode.style.color = 'white';
+        innerNode.style.textShadow = '1px 1px 1px rgba(0, 0, 0, 0.8)';
+
+        // Dynamic font sizing
+        let textLength = response.clipboardHistory[i].data.length;
+        let fontSize = Math.min(16, Math.max(8, 160 / textLength));
+        innerNode.style.fontSize = `${fontSize}px`;
+
+        // Minecraft item slot gradient
+        innerNode.style.backgroundImage =
+          'linear-gradient(45deg, #8B8B8B 25%, #9B9B9B 50%, #8B8B8B 75%)';
       } else {
-        innerNode.innerText = null;
-        innerNode.style.backgroundColor = 'lightgray';
+        // Empty slot styling
+        innerNode.style.backgroundColor = '#8B8B8B';
+        innerNode.style.border = '2px solid #373737';
+        innerNode.style.borderBottom = '2px solid #5B5B5B';
+        innerNode.style.borderRight = '2px solid #5B5B5B';
       }
+
+      // Click handler
       innerNode.onclick = () => {
-        if (response.clipboardHistory[i] && response.clipboardHistory[i] !== null) {
+        if (
+          response.clipboardHistory[i] &&
+          response.clipboardHistory[i] !== null
+        ) {
           setHighlighted(i);
           copyToClipboard(response.clipboardHistory[i].data);
         }
       };
-      innerNode.style.overflow = 'hidden';
-      innerNode.style.color = 'black';
-      if (response.clipboardHistory[i]) {
-        let fontZise; // should be avaliable space / number of letters around to equals the size of each
-        if (response.clipboardHistory[i].data.length < 10) {
-          fontZise = 22;
-        } else if (response.clipboardHistory[i].data.length < 20) {
-          // the math dosent math very well uwith thhis small of numbers
-          fontZise = 14;
-        } else {
-          // mathematically
-          // we have a certan area for the box in square px then we have each char taking up its height in px * its height in px square px (aruend), so the square of the nessesary height of each char is equal to the space allowed / the number of chars needed
-          // ie eachheight squared = allocated size / number of items
-          let constantAreaForBox = 6000;
-          let squaredOfZise = constantAreaForBox / response.clipboardHistory[i].data.length;
-          fontZise = Math.sqrt(squaredOfZise);
+
+      // Hover effect
+      innerNode.onmouseover = () => {
+        if (
+          response.clipboardHistory[i] &&
+          response.clipboardHistory[i] !== null
+        ) {
+          innerNode.style.backgroundColor = '#9B9B9B';
         }
+      };
 
-        if (fontZise < 1) fontZise = 1;
-        innerNode.style.fontSize = `${fontZise}px`;
-      }
+      innerNode.onmouseout = () => {
+        if (
+          response.clipboardHistory[i] &&
+          response.clipboardHistory[i] !== null
+        ) {
+          innerNode.style.backgroundColor = '#8B8B8B';
+        }
+      };
 
-      innerNode.style.margin = '0px';
-      innerNode.style.width = '80px';
-      innerNode.style.height = '80px';
-      innerNode.style.overflowWrap = 'normal'; // lol, i think this is actually best
-      outerNode.appendChild(innerNode);
+      slotContainer.appendChild(innerNode);
+      slotContainer.appendChild(slotNumber);
+      outerNode.appendChild(slotContainer);
     }
 
     DOMBODY.appendChild(outerNode);
