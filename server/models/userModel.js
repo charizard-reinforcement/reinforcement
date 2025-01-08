@@ -27,7 +27,7 @@ const userSchema = new Schema(
       required: [true, 'Last Name is required'],
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 userSchema.pre('save', async function (next) {

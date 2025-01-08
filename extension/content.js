@@ -5,9 +5,24 @@ addEventListener('focus', (event) => {
   render();
 });
 
-document.addEventListener('copy', () => {
-  console.log('Copy event detected');
+// paste event is after it happens
+// but we can delete the selected
+window.addEventListener('paste', (event) => {
+  use(highlighted);
+});
 
+document.addEventListener('copy', (event) => {
+  console.log('Copy event detected');
+  cutCopyEvent(event);
+});
+
+document.addEventListener('cut', (event) => {
+  console.log('Cut event detected');
+
+  cutCopyEvent(event);
+});
+
+function cutCopyEvent(event) {
   // Get the selected text
   const selectedText = window.getSelection().toString();
   console.log('Selected text:', selectedText);
@@ -27,32 +42,10 @@ document.addEventListener('copy', () => {
         console.log('Background script response:', response);
       },
     );
-
-    // // Update clipboard history
-    // chrome.storage.local.get(['clipboardHistory'], (result) => {
-    //   console.log('Current clipboard history:', result.clipboardHistory);
-    //   let history = result.clipboardHistory || [];
-
-    //   // Add new item to the beginning of the array
-    //   history.unshift(selectedText);
-    //   console.log('Added new item to history');
-
-    //   // Keep only the last 10 items
-    //   history = history.slice(0, 10);
-    //   console.log('Trimmed history to last 10 items');
-
-    //   // Save updated history
-    //   chrome.storage.local.set({ clipboardHistory: history }, () => {
-    //     console.log('Saved updated clipboard history:', history);
-    //     if (chrome.runtime.lastError) {
-    //       console.error('Error saving to storage:', chrome.runtime.lastError);
-    //     }
-    //   });
-    // });
   } else {
     console.log('No text selected during copy event');
   }
-});
+}
 
 let startingHot = [null, null, null, null, null, null, null, null, null, null];
 
@@ -88,6 +81,7 @@ async function addToInventory(text) {
         newInv.push(...response.clipboardHistory.slice(i + 1));
 
         setInventory(newInv);
+        setHighlighted(i);
 
         return;
       } else if (response.clipboardHistory[i] === undefined) {
@@ -95,6 +89,7 @@ async function addToInventory(text) {
         let newInv = startingHot;
         newInv[i] = { data: text };
         setInventory(newInv);
+        setHighlighted(i);
         return;
       }
     }
@@ -119,11 +114,11 @@ function use(slot) {
     let newInv = response.clipboardHistory.slice(0, slot);
     newInv.push(null);
     newInv.push(...response.clipboardHistory.slice(slot + 1));
-    if (highlighted === slot) {
-      setHighlighted(-1);
-    }
+    // if (highlighted === slot) {
+    //   setHighlighted(-1); // actually, no matter what, we should not higlight anyhting after this cause you just used the thing.
+    // }
     setInventory(newInv);
-    setHighlighted(-1);
+    //setHighlighted(-1); // or we could let it stay black and empty???
     copyToClipboard(temp.data);
   });
 }
@@ -164,7 +159,8 @@ function render() {
 
     for (let i = 0; i < 10; i++) {
       const innerNode = document.createElement('button');
-      innerNode.style.backgroundColor = 'lightGray';
+
+      //innerNode.style.backgroundColor = 'lightGray';
       if (i === highlighted) {
         innerNode.style.border = '5px solid black';
       } else {
@@ -172,11 +168,16 @@ function render() {
       }
       if (response.clipboardHistory[i] && response.clipboardHistory[i] !== null) {
         innerNode.innerText = response.clipboardHistory[i].data;
+        innerNode.style.backgroundImage = 'linear-gradient(to top right, lightgrey, white)';
       } else {
         innerNode.innerText = null;
+        innerNode.style.backgroundColor = 'lightgray';
       }
       innerNode.onclick = () => {
-        use(i);
+        if (response.clipboardHistory[i] && response.clipboardHistory[i] !== null) {
+          setHighlighted(i);
+          copyToClipboard(response.clipboardHistory[i].data);
+        }
       };
       innerNode.style.overflow = 'hidden';
       innerNode.style.color = 'black';
