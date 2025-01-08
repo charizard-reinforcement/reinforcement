@@ -123,7 +123,7 @@ function use(slot) {
       setHighlighted(-1);
     }
     setInventory(newInv);
-
+    setHighlighted(-1);
     copyToClipboard(temp.data);
   });
 }
