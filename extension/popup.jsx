@@ -27,28 +27,51 @@ function LoginPage() {
 
   const fetchClipboardHistory = async (userId) => {
     try {
-      const response = await fetch(
-        `http://localhost:3000/api/hotbar/${userId}`
-      );
+      const response = await fetch(`http://localhost:3000/api/hotbar/${userId}`);
       if (response.ok) {
         const clipboardData = await response.json();
         // Transform the data to match the expected format
         const transformedData = Array(10).fill(null);
-        clipboardData.forEach((item, index) => {
+        clipboardData.data.forEach((item, index) => {
           if (index < 10) {
-            transformedData[index] = { data: item.data };
+            transformedData[index] = { data: item };
           }
         });
         // Store the transformed data in chrome.storage
         chrome.storage.local.set({ clipboardHistory: transformedData }, () => {
-          console.log(
-            'Clipboard history loaded from database:',
-            transformedData
-          );
+          console.log('Clipboard history loaded from database:', transformedData);
         });
       } else {
         console.error('Failed to fetch clipboard history');
       }
+    } catch (err) {
+      console.error('Error fetching clipboard history:', err);
+    }
+  };
+
+  const setClipboardHistory = async () => {
+    try {
+      chrome.storage.local.get(['userId'], async (userResponse) => {
+        chrome.storage.local.get(['clipboardHistory'], async (response) => {
+          console.log('Clipboard history loaded from localstorage:', response);
+
+          const responseFromSet = await fetch(
+            `http://localhost:3000/api/hotbar/${userResponse.userId}`,
+
+            {
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ data: response.clipboardHistory.data }),
+              // ...
+              method: 'PUT',
+            },
+          );
+          if (responseFromSet.ok) {
+            console.log('succesfully wrote to db');
+          } else {
+            console.error('Failed to fetch clipboard history');
+          }
+        });
+      });
     } catch (err) {
       console.error('Error fetching clipboard history:', err);
     }
@@ -85,15 +108,11 @@ function LoginPage() {
   };
 
   const handleLogout = () => {
+    setClipboardHistory();
     setIsLoggedIn(false);
     setStoredUsername('');
     // Clear all stored data from chrome.storage
-    chrome.storage.local.remove([
-      'isLoggedIn',
-      'userId',
-      'username',
-      'clipboardHistory',
-    ]);
+    chrome.storage.local.remove(['isLoggedIn', 'userId', 'username', 'clipboardHistory']);
   };
 
   const handleRegister = async () => {
@@ -127,24 +146,15 @@ function LoginPage() {
     <div className='min-w-[300px] p-6 bg-white'>
       {isLoggedIn ? (
         <div className='space-y-6'>
-          <h2 className='text-2xl font-bold text-gray-800'>
-            Welcome, {storedUsername}!
-          </h2>
-          <button
-            onClick={handleLogout}
-            className='w-full bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors duration-200'
-          >
+          <h2 className='text-2xl font-bold text-gray-800'>Welcome, {storedUsername}!</h2>
+          <button onClick={handleLogout} className='w-full bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors duration-200'>
             Logout
           </button>
         </div>
       ) : (
         <div className='space-y-4'>
-          <h2 className='text-2xl font-bold text-gray-800 text-center'>
-            {isRegistering ? 'Register' : 'Login'}
-          </h2>
-          {errorMsg && (
-            <div className='text-red-500 text-center py-2'>{errorMsg}</div>
-          )}
+          <h2 className='text-2xl font-bold text-gray-800 text-center'>{isRegistering ? 'Register' : 'Login'}</h2>
+          {errorMsg && <div className='text-red-500 text-center py-2'>{errorMsg}</div>}
           <div className='space-y-4'>
             <input
               type='text'
@@ -186,16 +196,10 @@ function LoginPage() {
               </>
             )}
           </div>
-          <button
-            onClick={isRegistering ? handleRegister : handleLogin}
-            className='w-full bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors duration-200'
-          >
+          <button onClick={isRegistering ? handleRegister : handleLogin} className='w-full bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors duration-200'>
             {isRegistering ? 'Register' : 'Login'}
           </button>
-          <button
-            onClick={() => setIsRegistering(!isRegistering)}
-            className='w-full text-blue-500 hover:text-blue-600 transition-colors duration-200'
-          >
+          <button onClick={() => setIsRegistering(!isRegistering)} className='w-full text-blue-500 hover:text-blue-600 transition-colors duration-200'>
             {isRegistering ? 'Back to Login' : 'Create Account'}
           </button>
         </div>
@@ -207,5 +211,5 @@ function LoginPage() {
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <LoginPage />
-  </React.StrictMode>
+  </React.StrictMode>,
 );
