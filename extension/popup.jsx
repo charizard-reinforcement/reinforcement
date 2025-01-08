@@ -1,3 +1,4 @@
+// extension/popup.jsx
 import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom/client';
 import './styles.css';
@@ -5,117 +6,141 @@ import './styles.css';
 function LoginPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [isLoggedIn, setisLoggedIn] = useState(false);
-  const [errorMsg, seterrorMsg] = useState('');
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
+  const [email, setEmail] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [isRegistering, setIsRegistering] = useState(false);
 
   const handleLogin = async () => {
-    // setisLoggedIn(true);
     try {
-      const response = await fetch('/api/login', {
+      const response = await fetch('http://localhost:3000/api/users/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
       });
 
+      const data = await response.json();
+
       if (response.ok) {
-        const data = await response.json();
-        console.log('Login Success:', data);
         setIsLoggedIn(true);
-        seterrorMsg('');
+        setErrorMsg('');
+        // Store user ID in chrome.storage
+        chrome.storage.local.set({ userId: data.userId });
       } else {
-        seterrorMsg('Invalid credentials');
+        setErrorMsg(data.message || 'Invalid credentials');
       }
     } catch (err) {
-      seterrorMsg('An error occurred. Please try again.');
+      setErrorMsg('Connection error. Please try again.');
+    }
+  };
+
+  const handleRegister = async () => {
+    try {
+      const response = await fetch('http://localhost:3000/api/users/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username,
+          password,
+          email,
+          firstName,
+          lastName,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setIsRegistering(false);
+        setErrorMsg('Registration successful! Please login.');
+      } else {
+        setErrorMsg(data.message || 'Registration failed');
+      }
+    } catch (err) {
+      setErrorMsg('Connection error. Please try again.');
     }
   };
 
   const handleLogout = () => {
     setIsLoggedIn(false);
+    chrome.storage.local.remove('userId');
   };
 
   return (
-    <div>
+    <div className='p-4'>
       {isLoggedIn ? (
-        <div>
-          <h2>Welcome, {username}!</h2>
-          <button onClick={handleLogout}>Logout</button>
-          <Popup />
+        <div className='space-y-4'>
+          <h2 className='text-xl font-bold'>Welcome, {username}!</h2>
+          <button
+            onClick={handleLogout}
+            className='bg-red-500 text-white px-4 py-2 rounded'
+          >
+            Logout
+          </button>
         </div>
       ) : (
-        <div>
-          <h2>Login Page</h2>
-          <div>
-            <label>
-              Username:
-              <input type='text' value={username} onChange={(e) => setUsername(e.target.value)} />
-            </label>
+        <div className='space-y-4'>
+          <h2 className='text-xl font-bold'>
+            {isRegistering ? 'Register' : 'Login'}
+          </h2>
+          {errorMsg && <div className='text-red-500'>{errorMsg}</div>}
+          <div className='space-y-2'>
+            <input
+              type='text'
+              placeholder='Username'
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className='w-full p-2 border rounded'
+            />
+            <input
+              type='password'
+              placeholder='Password'
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className='w-full p-2 border rounded'
+            />
+            {isRegistering && (
+              <>
+                <input
+                  type='email'
+                  placeholder='Email'
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className='w-full p-2 border rounded'
+                />
+                <input
+                  type='text'
+                  placeholder='First Name'
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  className='w-full p-2 border rounded'
+                />
+                <input
+                  type='text'
+                  placeholder='Last Name'
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  className='w-full p-2 border rounded'
+                />
+              </>
+            )}
           </div>
-          <div>
-            <label>
-              Password:
-              <input type='password' value={password} onChange={(e) => setPassword(e.target.value)} />
-            </label>
-          </div>
-          <button onClick={handleLogin}>Login</button>
+          <button
+            onClick={isRegistering ? handleRegister : handleLogin}
+            className='w-full bg-blue-500 text-white px-4 py-2 rounded'
+          >
+            {isRegistering ? 'Register' : 'Login'}
+          </button>
+          <button
+            onClick={() => setIsRegistering(!isRegistering)}
+            className='w-full text-blue-500'
+          >
+            {isRegistering ? 'Back to Login' : 'Create Account'}
+          </button>
         </div>
       )}
-    </div>
-  );
-}
-
-// export default LoginPage;
-
-// function Popup() {
-//   return (
-//     <div>
-//       <h1>My Chrome Extension</h1>
-//     </div>
-//   );
-// }
-
-function Popup() {
-  const [clipboardHistory, setClipboardHistory] = useState([]);
-
-  useEffect(() => {
-    console.log('Popup opened - fetching clipboard history');
-    // Load clipboard history when popup opens
-    chrome.storage.local.get(['clipboardHistory'], (result) => {
-      console.log('Retrieved clipboard history:', result.clipboardHistory);
-      if (result.clipboardHistory) {
-        setClipboardHistory(result.clipboardHistory);
-      }
-    });
-  }, []);
-
-  const copyToClipboard = (text) => {
-    console.log('Copying to clipboard:', text);
-    navigator.clipboard
-      .writeText(text)
-      .then(() => {
-        console.log('Successfully copied to clipboard');
-      })
-      .catch((err) => {
-        console.error('Failed to copy to clipboard:', err);
-      });
-  };
-
-  console.log('Current clipboard history state:', clipboardHistory);
-
-  return (
-    <div className='p-4 w-80'>
-      <h1 className='text-xl font-bold mb-4'>Clipboard History</h1>
-      <div className='space-y-2'>
-        {clipboardHistory.length === 0 ? (
-          <p className='text-gray-500'>No items in clipboard history</p>
-        ) : (
-          clipboardHistory.map((item, index) => (
-            <div key={index} className='p-2 border rounded hover:bg-gray-100 cursor-pointer group' onClick={() => copyToClipboard(item)}>
-              <p className='truncate'>{item}</p>
-            </div>
-          ))
-        )}
-      </div>
     </div>
   );
 }
@@ -123,6 +148,5 @@ function Popup() {
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <LoginPage />
-    <Popup />
-  </React.StrictMode>,
+  </React.StrictMode>
 );
