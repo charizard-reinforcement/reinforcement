@@ -5,6 +5,12 @@ addEventListener('focus', (event) => {
   render();
 });
 
+// paste event is after it happens
+// but we can delete the selected
+window.addEventListener('paste', (event) => {
+  use(highlighted);
+});
+
 document.addEventListener('copy', () => {
   console.log('Copy event detected');
 
@@ -88,6 +94,7 @@ async function addToInventory(text) {
         newInv.push(...response.clipboardHistory.slice(i + 1));
 
         setInventory(newInv);
+        setHighlighted(i);
 
         return;
       } else if (response.clipboardHistory[i] === undefined) {
@@ -95,6 +102,7 @@ async function addToInventory(text) {
         let newInv = startingHot;
         newInv[i] = { data: text };
         setInventory(newInv);
+        setHighlighted(i);
         return;
       }
     }
@@ -119,11 +127,11 @@ function use(slot) {
     let newInv = response.clipboardHistory.slice(0, slot);
     newInv.push(null);
     newInv.push(...response.clipboardHistory.slice(slot + 1));
-    if (highlighted === slot) {
-      setHighlighted(-1);
-    }
+    // if (highlighted === slot) {
+    //   setHighlighted(-1); // actually, no matter what, we should not higlight anyhting after this cause you just used the thing.
+    // }
     setInventory(newInv);
-    setHighlighted(-1);
+    //setHighlighted(-1); // or we could let it stay black and empty???
     copyToClipboard(temp.data);
   });
 }
@@ -176,7 +184,8 @@ function render() {
         innerNode.innerText = null;
       }
       innerNode.onclick = () => {
-        use(i);
+        setHighlighted(i);
+        copyToClipboard(response.clipboardHistory[i].data);
       };
       innerNode.style.overflow = 'hidden';
       innerNode.style.color = 'black';
