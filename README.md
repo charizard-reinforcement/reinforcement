@@ -55,3 +55,11 @@ The extension requires the following permissions:
 ## Contributing
 
 Feel free to submit issues, fork the repository, and create pull requests for any improvements.
+
+<h1>✍️ Authors</h1>
+
+- **Garrett Chow** - [@garrettlchow](https://github.com/garrettlchow)
+- **Patrice Pinardo** - [@pinardo88](https://github.com/pinardo88)
+- **Noah Favelo** - [@noahFavelo](https://github.com/noahFavelo)
+- **Mark Ngheim** - [@MarkNghiem](https://github.com/MarkNghiem)
+- **Quin Kirsten** - [@quinkirsten](https://github.com/quinkirsten)
