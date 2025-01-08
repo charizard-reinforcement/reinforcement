@@ -69,37 +69,41 @@ function LoginPage() {
   };
 
   return (
-    <div className='p-4'>
+    <div className='min-w-[300px] p-6 bg-white'>
       {isLoggedIn ? (
-        <div className='space-y-4'>
-          <h2 className='text-xl font-bold'>Welcome, {username}!</h2>
+        <div className='space-y-6'>
+          <h2 className='text-2xl font-bold text-gray-800'>
+            Welcome, {username}!
+          </h2>
           <button
             onClick={handleLogout}
-            className='bg-red-500 text-white px-4 py-2 rounded'
+            className='w-full bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors duration-200'
           >
             Logout
           </button>
         </div>
       ) : (
         <div className='space-y-4'>
-          <h2 className='text-xl font-bold'>
+          <h2 className='text-2xl font-bold text-gray-800 text-center'>
             {isRegistering ? 'Register' : 'Login'}
           </h2>
-          {errorMsg && <div className='text-red-500'>{errorMsg}</div>}
-          <div className='space-y-2'>
+          {errorMsg && (
+            <div className='text-red-500 text-center py-2'>{errorMsg}</div>
+          )}
+          <div className='space-y-4'>
             <input
               type='text'
               placeholder='Username'
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className='w-full p-2 border rounded'
+              className='w-full p-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all duration-200'
             />
             <input
               type='password'
               placeholder='Password'
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className='w-full p-2 border rounded'
+              className='w-full p-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all duration-200'
             />
             {isRegistering && (
               <>
@@ -108,34 +112,34 @@ function LoginPage() {
                   placeholder='Email'
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className='w-full p-2 border rounded'
+                  className='w-full p-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all duration-200'
                 />
                 <input
                   type='text'
                   placeholder='First Name'
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
-                  className='w-full p-2 border rounded'
+                  className='w-full p-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all duration-200'
                 />
                 <input
                   type='text'
                   placeholder='Last Name'
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
-                  className='w-full p-2 border rounded'
+                  className='w-full p-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all duration-200'
                 />
               </>
             )}
           </div>
           <button
             onClick={isRegistering ? handleRegister : handleLogin}
-            className='w-full bg-blue-500 text-white px-4 py-2 rounded'
+            className='w-full bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors duration-200'
           >
             {isRegistering ? 'Register' : 'Login'}
           </button>
           <button
             onClick={() => setIsRegistering(!isRegistering)}
-            className='w-full text-blue-500'
+            className='w-full text-blue-500 hover:text-blue-600 transition-colors duration-200'
           >
             {isRegistering ? 'Back to Login' : 'Create Account'}
           </button>
