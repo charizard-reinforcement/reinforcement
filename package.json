@@ -8,7 +8,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "server": "nodemon server/index.js",
-    "build:extension": "vite build && cp extension/manifest.json dist/extension/"
+    "build:extension": "vite build && cp extension/manifest.json dist/extension/ && cp -r extension/assets dist/extension/"
   },
   "dependencies": {
     "bcrypt": "^5.1.1",
