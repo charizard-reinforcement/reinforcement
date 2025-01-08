@@ -25,19 +25,19 @@ const Data = mongoose.model('Data', dataSchema);
 // Sample data to insert
 const sampleData = [
   {
-    data: 'Hello World!',
+    data: 'FTRI 51',
   },
   {
-    data: 'Important meeting notes for tomorrow',
+    data: 'IS',
   },
   {
-    data: 'https://example.com/important-link',
+    data: 'THE',
   },
   {
-    data: 'Phone: (555) 123-4567',
+    data: 'BEST!!',
   },
   {
-    data: 'Remember to buy groceries',
+    data: 'buy groceries',
   },
 ];
 

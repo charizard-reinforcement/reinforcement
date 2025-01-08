@@ -1,9 +1,13 @@
 {
   "manifest_version": 3,
-  "name": "Clipboard History",
+  "name": "copytory",
   "version": "1.0",
   "description": "Store and manage your last 10 copied items.",
   "permissions": ["storage", "clipboardRead", "clipboardWrite"],
+  "icons": {
+    "48": "assets/copytoryLogo48.png",
+    "128": "assets/copytoryLogo128.png"
+  },
   "action": {
     "default_popup": "popup.html"
   },

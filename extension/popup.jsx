@@ -11,6 +11,19 @@ function LoginPage() {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [isRegistering, setIsRegistering] = useState(false);
+  const [storedUsername, setStoredUsername] = useState('');
+
+  // Check login status when component mounts
+  useEffect(() => {
+    chrome.storage.local.get(['isLoggedIn', 'username', 'userId'], (result) => {
+      if (result.isLoggedIn) {
+        setIsLoggedIn(true);
+        setStoredUsername(result.username);
+        // Fetch clipboard history for logged-in user
+        fetchClipboardHistory(result.userId);
+      }
+    });
+  }, []);
 
   const fetchClipboardHistory = async (userId) => {
     try {
@@ -54,8 +67,13 @@ function LoginPage() {
       if (response.ok) {
         setIsLoggedIn(true);
         setErrorMsg('');
-        // Store user ID in chrome.storage
-        chrome.storage.local.set({ userId: data.userId });
+        setStoredUsername(username);
+        // Store login status and username in chrome.storage
+        chrome.storage.local.set({
+          isLoggedIn: true,
+          userId: data.userId,
+          username: username,
+        });
         // Fetch clipboard history after successful login
         await fetchClipboardHistory(data.userId);
       } else {
@@ -66,7 +84,18 @@ function LoginPage() {
     }
   };
 
-  // Rest of the component remains the same...
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    setStoredUsername('');
+    // Clear all stored data from chrome.storage
+    chrome.storage.local.remove([
+      'isLoggedIn',
+      'userId',
+      'username',
+      'clipboardHistory',
+    ]);
+  };
+
   const handleRegister = async () => {
     try {
       const response = await fetch('http://localhost:3000/api/users/register', {
@@ -94,17 +123,12 @@ function LoginPage() {
     }
   };
 
-  const handleLogout = () => {
-    setIsLoggedIn(false);
-    chrome.storage.local.remove(['userId', 'clipboardHistory']);
-  };
-
   return (
     <div className='min-w-[300px] p-6 bg-white'>
       {isLoggedIn ? (
         <div className='space-y-6'>
           <h2 className='text-2xl font-bold text-gray-800'>
-            Welcome, {username}!
+            Welcome, {storedUsername}!
           </h2>
           <button
             onClick={handleLogout}
