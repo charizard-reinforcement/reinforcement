@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "copytory",
   "version": "1.0",
-  "description": "Store and manage your last 10 copied items.",
+  "description": "A Minecraft-inspired clipboard manager that saves your last 10 copied items in a stylish hotbar. Access your clipboard history with number keys or clicks!",
   "permissions": ["storage", "clipboardRead", "clipboardWrite"],
   "icons": {
     "48": "assets/copytoryLogo48.png",
