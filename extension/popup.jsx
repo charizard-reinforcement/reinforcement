@@ -1,4 +1,3 @@
-// extension/popup.jsx
 import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom/client';
 import './styles.css';
@@ -12,6 +11,35 @@ function LoginPage() {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [isRegistering, setIsRegistering] = useState(false);
+
+  const fetchClipboardHistory = async (userId) => {
+    try {
+      const response = await fetch(
+        `http://localhost:3000/api/hotbar/${userId}`
+      );
+      if (response.ok) {
+        const clipboardData = await response.json();
+        // Transform the data to match the expected format
+        const transformedData = Array(10).fill(null);
+        clipboardData.forEach((item, index) => {
+          if (index < 10) {
+            transformedData[index] = { data: item.data };
+          }
+        });
+        // Store the transformed data in chrome.storage
+        chrome.storage.local.set({ clipboardHistory: transformedData }, () => {
+          console.log(
+            'Clipboard history loaded from database:',
+            transformedData
+          );
+        });
+      } else {
+        console.error('Failed to fetch clipboard history');
+      }
+    } catch (err) {
+      console.error('Error fetching clipboard history:', err);
+    }
+  };
 
   const handleLogin = async () => {
     try {
@@ -28,6 +56,8 @@ function LoginPage() {
         setErrorMsg('');
         // Store user ID in chrome.storage
         chrome.storage.local.set({ userId: data.userId });
+        // Fetch clipboard history after successful login
+        await fetchClipboardHistory(data.userId);
       } else {
         setErrorMsg(data.message || 'Invalid credentials');
       }
@@ -36,6 +66,7 @@ function LoginPage() {
     }
   };
 
+  // Rest of the component remains the same...
   const handleRegister = async () => {
     try {
       const response = await fetch('http://localhost:3000/api/users/register', {
@@ -65,7 +96,7 @@ function LoginPage() {
 
   const handleLogout = () => {
     setIsLoggedIn(false);
-    chrome.storage.local.remove('userId');
+    chrome.storage.local.remove(['userId', 'clipboardHistory']);
   };
 
   return (
