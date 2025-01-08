@@ -1,10 +1,10 @@
 import express from 'express';
 import Data from '../models/dataModel.js';
 
-const router = express.Router();
+const hotbarRouter = express.Router();
 
 // Retrieve all hotbar slots (copied items) for a specific user
-router.get('/:userId', async (req, res, next) => {
+hotbarRouter.get('/:userId', async (req, res, next) => {
     try {
         const { userId } = req.params;
         // Fetch copied items from MongoDB
@@ -20,7 +20,7 @@ router.get('/:userId', async (req, res, next) => {
 });
 
 // Update an existing hotbar slot
-router.put('/:id', async (req, res, next) => {
+hotbarRouter.put('/:id', async (req, res, next) => {
     try {
         const { id } = req.params;
         const { data } = req.body;
@@ -41,7 +41,7 @@ router.put('/:id', async (req, res, next) => {
 })
 
 // Remove a copied item by its id
-router.delete('/:id', async (req, res, next) => {
+hotbarRouter.delete('/:id', async (req, res, next) => {
     try {
         const { id } = req.params;
         // Remove slot by its id from MongoDB
@@ -57,4 +57,4 @@ router.delete('/:id', async (req, res, next) => {
 });
 
 
-export default router;
+export default hotbarRouter;

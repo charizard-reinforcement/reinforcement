@@ -1,11 +1,14 @@
-import express, { urlencoded } from 'express';
+import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-import connectDB from './db/mongo';
-import hotbarRoutes from './routes/hotbarRoutes.js';
+// Imports from other files
+import connectDB from './db/mongo.js';
+// Routers
+import hotbarRouter from './routes/hotbarRouter.js';
+import userRouter from './routes/userRouter.js';
 
 // Config path for usability in ES Module
 const __filename = fileURLToPath(import.meta.url);
@@ -14,6 +17,7 @@ const __dirname = path.dirname(__filename);
 const app = express();
 dotenv.config();
 
+// Configurations
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
@@ -23,15 +27,22 @@ app.use(
 	})
 );
 
+//Serving Static Files
 app.use(express.static(path.resolve(__dirname, './')));
 app.use(express.static(path.resolve(__dirname, '../src')));
 app.use(express.static(path.resolve(__dirname, '../index.html')));
 
 // Connect to DB
-connectDB();
+connectDB()
+	.then(() => console.log(`✅ Established connection to Database`))
+	.catch((error) => {
+		console.error(error);
+		console.log(`❌ Unable to connect to the database`);
+	});
 
 // API Routes
-app.use('/api/hotbar', hotbarRoutes);
+app.use('/api/hotbar', hotbarRouter);
+app.use('/user', userRouter);
 
 // Server runs on PORT 3000
 const PORT = 3000;

@@ -5,7 +5,6 @@ const { Schema, model } = mongoose;
 
 const userSchema = new Schema(
 	{
-		_id: Schema.Types.ObjectId,
 		username: {
 			type: String,
 			required: [true, 'Username is required'],
@@ -33,7 +32,7 @@ const userSchema = new Schema(
 userSchema.pre('save', async function (next) {
 	console.log(`#️⃣ Hashing Password...`);
 	try {
-		const hashedPassword = bcrypt.hash(this.password, 10);
+		const hashedPassword = await bcrypt.hash(this.password, 10);
 		this.password = hashedPassword;
 		return next();
 	} catch (error) {

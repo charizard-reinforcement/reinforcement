@@ -5,7 +5,6 @@ const { Schema, model } = mongoose;
 const dataSchema = new Schema (
   {
     // ID for each data
-    _id: Schema.Types.ObjectId,
     userId: {
       type: Schema.Types.ObjectId,
       required: true,
