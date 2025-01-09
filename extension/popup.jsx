@@ -34,7 +34,7 @@ function LoginPage() {
         // Transform the data to match the expected format
         const transformedData = Array(10).fill(null);
 
-        if (clipboardData.data === undefined) clipboardData = { data: [null, { data: 'hi' }, null, null, null, null, null, null, null, null] };
+        if (clipboardData.data === undefined) clipboardData = { data: [null, { data: 'welcome' }, { data: 'to' }, { data: 'copytory' }, null, null, null, null, null, null] };
         clipboardData.data.forEach((item, index) => {
           if (index < 10) {
             transformedData[index] = item;
