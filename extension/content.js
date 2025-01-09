@@ -229,7 +229,7 @@ function render() {
 
       // Click handler
       innerNode.onclick = () => {
-        if (response.clipboardHistory[i] && response.clipboardHistory[i] !== null) {
+        if (response !== undefined && response.clipboardHistory[i] && response.clipboardHistory[i] !== null) {
           setHighlighted(i);
           copyToClipboard(response.clipboardHistory[i].data);
         }
@@ -237,7 +237,7 @@ function render() {
 
       // Hover effect
       innerNode.onmouseover = () => {
-        if (response.clipboardHistory[i] && response.clipboardHistory[i] !== null) {
+        if (response && response.clipboardHistory[i] && response.clipboardHistory[i] !== null) {
           innerNode.style.backgroundColor = '#9B9B9B';
         }
       };
