@@ -40,7 +40,7 @@ function cutCopyEvent(event) {
       },
       (response) => {
         console.log('Background script response:', response);
-      }
+      },
     );
   } else {
     console.log('No text selected during copy event');
@@ -130,10 +130,7 @@ const keyDownFunction = (event) => {
       if (adjusted < 0) {
         adjusted = 9;
       }
-      if (
-        response.clipboardHistory[adjusted] &&
-        response.clipboardHistory[adjusted] !== null
-      ) {
+      if (response.clipboardHistory[adjusted] && response.clipboardHistory[adjusted] !== null) {
         setHighlighted(adjusted);
         copyToClipboard(response.clipboardHistory[adjusted].data);
       }
@@ -210,10 +207,7 @@ function render() {
       }
 
       // Content styling
-      if (
-        response.clipboardHistory[i] &&
-        response.clipboardHistory[i] !== null
-      ) {
+      if (response && response.clipboardHistory[i] && response.clipboardHistory[i] !== null) {
         innerNode.innerText = response.clipboardHistory[i].data;
         innerNode.style.color = 'white';
         innerNode.style.textShadow = '1px 1px 1px rgba(0, 0, 0, 0.8)';
@@ -224,8 +218,7 @@ function render() {
         innerNode.style.fontSize = `${fontSize}px`;
 
         // Minecraft item slot gradient
-        innerNode.style.backgroundImage =
-          'linear-gradient(45deg, #8B8B8B 25%, #9B9B9B 50%, #8B8B8B 75%)';
+        innerNode.style.backgroundImage = 'linear-gradient(45deg, #8B8B8B 25%, #9B9B9B 50%, #8B8B8B 75%)';
       } else {
         // Empty slot styling
         innerNode.style.backgroundColor = '#8B8B8B';
@@ -236,10 +229,7 @@ function render() {
 
       // Click handler
       innerNode.onclick = () => {
-        if (
-          response.clipboardHistory[i] &&
-          response.clipboardHistory[i] !== null
-        ) {
+        if (response !== undefined && response.clipboardHistory[i] && response.clipboardHistory[i] !== null) {
           setHighlighted(i);
           copyToClipboard(response.clipboardHistory[i].data);
         }
@@ -247,19 +237,13 @@ function render() {
 
       // Hover effect
       innerNode.onmouseover = () => {
-        if (
-          response.clipboardHistory[i] &&
-          response.clipboardHistory[i] !== null
-        ) {
+        if (response && response.clipboardHistory[i] && response.clipboardHistory[i] !== null) {
           innerNode.style.backgroundColor = '#9B9B9B';
         }
       };
 
       innerNode.onmouseout = () => {
-        if (
-          response.clipboardHistory[i] &&
-          response.clipboardHistory[i] !== null
-        ) {
+        if (response.clipboardHistory[i] && response.clipboardHistory[i] !== null) {
           innerNode.style.backgroundColor = '#8B8B8B';
         }
       };
