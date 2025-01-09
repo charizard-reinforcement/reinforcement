@@ -11,11 +11,11 @@ const dataSchema = new Schema(
       required: true,
     },
     data: {
-      type: String,
+      type: Array,
       required: [true, 'Please provided copied data'],
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 const Data = model('Data', dataSchema);

@@ -15,43 +15,80 @@ function LoginPage() {
 
   // Check login status when component mounts
   useEffect(() => {
-    chrome.storage.local.get(['isLoggedIn', 'username', 'userId'], (result) => {
+    chrome.storage.local.get(['isLoggedIn', 'username', 'userId'], async (result) => {
       if (result.isLoggedIn) {
         setIsLoggedIn(true);
         setStoredUsername(result.username);
         // Fetch clipboard history for logged-in user
-        fetchClipboardHistory(result.userId);
+        // fetchClipboardHistory(); //ok, your logged in to always fetch immediately, but no, cause you are probbably logging in to logout
+        // basically, no.
       }
     });
   }, []);
 
   const fetchClipboardHistory = async (userId) => {
     try {
-      const response = await fetch(
-        `http://localhost:3000/api/hotbar/${userId}`
-      );
+      const response = await fetch(`http://localhost:3000/api/hotbar/${userId}`);
       if (response.ok) {
-        const clipboardData = await response.json();
+        let clipboardData = await response.json();
         // Transform the data to match the expected format
         const transformedData = Array(10).fill(null);
-        clipboardData.forEach((item, index) => {
+
+        if (clipboardData.data === undefined) clipboardData = { data: [null, { data: 'hi' }, null, null, null, null, null, null, null, null] };
+        clipboardData.data.forEach((item, index) => {
           if (index < 10) {
-            transformedData[index] = { data: item.data };
+            transformedData[index] = item;
           }
         });
         // Store the transformed data in chrome.storage
         chrome.storage.local.set({ clipboardHistory: transformedData }, () => {
-          console.log(
-            'Clipboard history loaded from database:',
-            transformedData
-          );
+          console.log('Clipboard history loaded from database:', transformedData);
         });
       } else {
         console.error('Failed to fetch clipboard history');
       }
     } catch (err) {
-      console.error('Error fetching clipboard history:', err);
+      console.error('Error fetching clipboard history  :', err);
     }
+  };
+
+  const setClipboardHistory = async () => {
+    let myPromise = new Promise((resolve, reject) => {
+      try {
+        chrome.storage.local.get(['userId'], async (userResponse) => {
+          try {
+            chrome.storage.local.get(['clipboardHistory'], async (clipResponse) => {
+              console.log('Clipboard history loaded from localstorage:', clipResponse);
+
+              const responseFromSet = await fetch(
+                `http://localhost:3000/api/hotbar/${userResponse.userId}`,
+
+                {
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ data: clipResponse.clipboardHistory }),
+                  // ...
+                  method: 'PUT',
+                },
+              );
+              if (responseFromSet.ok) {
+                console.log('succesfully wrote to db');
+                resolve(null);
+              } else {
+                console.error('Failed to fetch clipboard history to set');
+                reject('Failed to fetch clipboard history to set');
+              }
+            });
+          } catch (err) {
+            console.error('Error fetching clipboard history:', err);
+            reject('in popup.jsz trying to fetch clip history from localstorage' + err);
+          }
+        });
+      } catch (err) {
+        console.error('Error fetching user data:', err);
+        reject('in popup.jsz trying to fetch user data from localstorage' + err);
+      }
+    });
+    return myPromise;
   };
 
   const handleLogin = async () => {
@@ -84,16 +121,12 @@ function LoginPage() {
     }
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await setClipboardHistory();
     setIsLoggedIn(false);
     setStoredUsername('');
     // Clear all stored data from chrome.storage
-    chrome.storage.local.remove([
-      'isLoggedIn',
-      'userId',
-      'username',
-      'clipboardHistory',
-    ]);
+    chrome.storage.local.remove(['isLoggedIn', 'userId', 'username' /* 'clipboardHistory' */]); // please NO, dont reset this untill we want to break it for non logged in users.
   };
 
   const handleRegister = async () => {
@@ -127,24 +160,15 @@ function LoginPage() {
     <div className='min-w-[300px] p-6 bg-white'>
       {isLoggedIn ? (
         <div className='space-y-6'>
-          <h2 className='text-2xl font-bold text-gray-800'>
-            Welcome, {storedUsername}!
-          </h2>
-          <button
-            onClick={handleLogout}
-            className='w-full bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors duration-200'
-          >
+          <h2 className='text-2xl font-bold text-gray-800'>Welcome, {storedUsername}!</h2>
+          <button onClick={handleLogout} className='w-full bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors duration-200'>
             Logout
           </button>
         </div>
       ) : (
         <div className='space-y-4'>
-          <h2 className='text-2xl font-bold text-gray-800 text-center'>
-            {isRegistering ? 'Register' : 'Login'}
-          </h2>
-          {errorMsg && (
-            <div className='text-red-500 text-center py-2'>{errorMsg}</div>
-          )}
+          <h2 className='text-2xl font-bold text-gray-800 text-center'>{isRegistering ? 'Register' : 'Login'}</h2>
+          {errorMsg && <div className='text-red-500 text-center py-2'>{errorMsg}</div>}
           <div className='space-y-4'>
             <input
               type='text'
@@ -186,16 +210,10 @@ function LoginPage() {
               </>
             )}
           </div>
-          <button
-            onClick={isRegistering ? handleRegister : handleLogin}
-            className='w-full bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors duration-200'
-          >
+          <button onClick={isRegistering ? handleRegister : handleLogin} className='w-full bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors duration-200'>
             {isRegistering ? 'Register' : 'Login'}
           </button>
-          <button
-            onClick={() => setIsRegistering(!isRegistering)}
-            className='w-full text-blue-500 hover:text-blue-600 transition-colors duration-200'
-          >
+          <button onClick={() => setIsRegistering(!isRegistering)} className='w-full text-blue-500 hover:text-blue-600 transition-colors duration-200'>
             {isRegistering ? 'Back to Login' : 'Create Account'}
           </button>
         </div>
@@ -207,5 +225,5 @@ function LoginPage() {
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <LoginPage />
-  </React.StrictMode>
+  </React.StrictMode>,
 );
