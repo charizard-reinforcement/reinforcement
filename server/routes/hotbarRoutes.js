@@ -13,7 +13,7 @@ router.get('/:userId', async (req, res, next) => {
   try {
     const { userId } = req.params;
     // Fetch copied items from MongoDB
-    const copiedItems = await Data.find({ userId }).exec();
+    const copiedItems = await Data.findOne({ userId }).exec();
     console.log('items', copiedItems);
     res.status(200).json(copiedItems);
   } catch (err) {
@@ -31,12 +31,9 @@ router.put('/:userId', async (req, res, next) => {
     const { userId } = req.params;
     const { data } = req.body;
     // Update hotbar slot by its id in MongoDB
-    console.log('UPDATING');
-    console.log(userId);
-    console.log(req.body);
-    console.log(data);
+
     const updatedItem = await Data.findOneAndUpdate({ userId: userId }, { data: data }, { new: true, runValidators: true, upsert: true }).exec();
-    console.log('DONE UPDATING');
+    console.log('upserted/updated this :');
     console.log(updatedItem);
     res.status(200).json(updatedItem);
   } catch (err) {

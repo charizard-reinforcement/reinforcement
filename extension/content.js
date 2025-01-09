@@ -166,7 +166,8 @@ function render() {
       } else {
         innerNode.style.border = '5px solid gray';
       }
-      if (response.clipboardHistory[i] && response.clipboardHistory[i] !== null) {
+      console.log(response.clipboardHistory[i]);
+      if (response && response.clipboardHistory[i] && response.clipboardHistory[i] !== null) {
         innerNode.innerText = response.clipboardHistory[i].data;
         innerNode.style.backgroundImage = 'linear-gradient(to top right, lightgrey, white)';
       } else {
@@ -174,14 +175,14 @@ function render() {
         innerNode.style.backgroundColor = 'lightgray';
       }
       innerNode.onclick = () => {
-        if (response.clipboardHistory[i] && response.clipboardHistory[i] !== null) {
+        if (response !== undefined && response.clipboardHistory[i] && response.clipboardHistory[i] !== null) {
           setHighlighted(i);
           copyToClipboard(response.clipboardHistory[i].data);
         }
       };
       innerNode.style.overflow = 'hidden';
       innerNode.style.color = 'black';
-      if (response.clipboardHistory[i]) {
+      if (response.clipboardHistory[i] && response.clipboardHistory[i].data) {
         let fontZise; // should be avaliable space / number of letters around to equals the size of each
         if (response.clipboardHistory[i].data.length < 10) {
           fontZise = 22;
