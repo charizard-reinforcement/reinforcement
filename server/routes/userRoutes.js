@@ -20,7 +20,8 @@ router.post('/login', async (req, res, next) => {
     if (!isValidPassword) {
       return res.status(401).json({ message: 'Invalid username or password' });
     }
-
+    // could use a one way hash here, but it would be to easy to crack because anyone can log in and get both sides. Bob -> fkasljfa
+    // use a specific salt for each user, and store it next to thier login, bcrypt
     res.status(200).json({
       message: 'Login successful',
       userId: user.username,
