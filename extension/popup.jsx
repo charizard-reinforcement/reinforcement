@@ -122,7 +122,12 @@ function LoginPage() {
   };
 
   const handleLogout = async () => {
-    await setClipboardHistory();
+    try {
+      await setClipboardHistory();
+    } catch (err) {
+      alert('Error' + err);
+    }
+
     setIsLoggedIn(false);
     setStoredUsername('');
     // Clear all stored data from chrome.storage
